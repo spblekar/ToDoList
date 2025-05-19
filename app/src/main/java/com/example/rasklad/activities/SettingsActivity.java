@@ -5,9 +5,7 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Switch;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.example.rasklad.R;
 import com.example.rasklad.constants.AppConstants;
 import com.example.rasklad.utils.PreferenceHelper;
@@ -31,7 +29,6 @@ public class SettingsActivity extends AppCompatActivity {
         radioPriority = findViewById(R.id.radioPriority);
         buttonSaveSettings = findViewById(R.id.buttonSaveSettings);
 
-        // Загрузка сохранённых настроек
         switchNotifications.setChecked(PreferenceHelper.isNotificationsEnabled(this));
         int theme = PreferenceHelper.getTheme(this);
         if (theme == AppConstants.THEME_LIGHT) radioLight.setChecked(true);

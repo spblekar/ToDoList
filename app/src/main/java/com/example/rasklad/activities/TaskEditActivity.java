@@ -1,7 +1,7 @@
 package com.example.rasklad.activities;
 
+import android.app.TimePickerDialog;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -10,10 +10,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.CheckBox;
-
 import androidx.appcompat.app.AppCompatActivity;
-
-
 import com.example.rasklad.R;
 import com.example.rasklad.database.repository.CategoryRepository;
 import com.example.rasklad.database.repository.TaskRepository;
@@ -74,7 +71,7 @@ public class TaskEditActivity extends AppCompatActivity {
                 Calendar cal = Calendar.getInstance();
                 cal.setTimeInMillis(task.getDueDate());
                 datePicker.updateDate(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
-                // Устанавливаем выбранную категорию
+
                 for (int i = 0; i < categories.size(); i++) {
                     if (categories.get(i).getId() == task.getCategoryId()) {
                         spinnerCategory.setSelection(i);
@@ -96,6 +93,19 @@ public class TaskEditActivity extends AppCompatActivity {
             }
         }
 
+        Button buttonSelectTime = findViewById(R.id.buttonSelectTime);
+        final Calendar timeCalendar = Calendar.getInstance();
+
+        buttonSelectTime.setOnClickListener(v -> {
+            int hour = timeCalendar.get(Calendar.HOUR_OF_DAY);
+            int minute = timeCalendar.get(Calendar.MINUTE);
+            new TimePickerDialog(this, (view, selectedHour, selectedMinute) -> {
+                timeCalendar.set(Calendar.HOUR_OF_DAY, selectedHour);
+                timeCalendar.set(Calendar.MINUTE, selectedMinute);
+            }, hour, minute, true).show();
+        });
+
+
         buttonSaveTask.setOnClickListener(v -> {
             task.setTitle(editTextTitle.getText().toString());
             task.setDescription(editTextDescription.getText().toString());
@@ -114,6 +124,13 @@ public class TaskEditActivity extends AppCompatActivity {
             task.setPriority(priority);
             task.setCompleted(checkBoxCompleted.isChecked());
 
+            cal.set(Calendar.HOUR_OF_DAY, timeCalendar.get(Calendar.HOUR_OF_DAY));
+            cal.set(Calendar.MINUTE, timeCalendar.get(Calendar.MINUTE));
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            task.setDueDate(cal.getTimeInMillis());
+
+
             if (task.getId() > 0) {
                 taskRepository.updateTask(task);
             } else {
@@ -121,5 +138,8 @@ public class TaskEditActivity extends AppCompatActivity {
             }
             finish();
         });
+
+        Button buttonCancel = findViewById(R.id.buttonCancelTask);
+        buttonCancel.setOnClickListener(v -> finish());
     }
 }

@@ -4,11 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.rasklad.R;
 import com.example.rasklad.adapters.TaskAdapter;
 import com.example.rasklad.constants.AppConstants;
@@ -16,9 +14,7 @@ import com.example.rasklad.database.repository.TaskRepository;
 import com.example.rasklad.models.Task;
 import com.example.rasklad.utils.DateUtils;
 import com.example.rasklad.utils.PreferenceHelper;
-
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class DayDetailsActivity extends AppCompatActivity {
