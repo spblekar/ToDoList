@@ -4,16 +4,13 @@ import android.app.AlertDialog;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.rasklad.R;
 import com.example.rasklad.adapters.CategoryAdapter;
 import com.example.rasklad.database.repository.CategoryRepository;
 import com.example.rasklad.models.Category;
-
 import java.util.List;
 
 public class CategoriesActivity extends AppCompatActivity {

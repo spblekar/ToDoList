@@ -2,7 +2,6 @@ package com.example.rasklad.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-
 import com.example.rasklad.constants.AppConstants;
 
 public class PreferenceHelper {

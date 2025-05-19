@@ -1,26 +1,20 @@
 package com.example.rasklad.adapters;
 
-
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
-
-
 import com.example.rasklad.R;
 import com.example.rasklad.activities.TaskEditActivity;
 import com.example.rasklad.database.repository.TaskRepository;
 import com.example.rasklad.models.Task;
 import com.example.rasklad.utils.DateUtils;
 import com.example.rasklad.utils.PriorityUtils;
-
 import java.util.List;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {

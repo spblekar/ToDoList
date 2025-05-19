@@ -2,17 +2,15 @@ package com.example.rasklad.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
-
+import android.widget.CalendarView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.rasklad.R;
 import com.example.rasklad.adapters.PreviewDayAdapter;
 import com.example.rasklad.database.repository.TaskRepository;
-
+import java.util.Calendar;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -47,8 +45,17 @@ public class MainActivity extends AppCompatActivity {
         buttonSettings.setOnClickListener(v -> {
             startActivity(new Intent(this, SettingsActivity.class));
         });
-    }
 
+        CalendarView calendarView = findViewById(R.id.calendarView);
+        calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
+            Calendar cal = Calendar.getInstance();
+            cal.set(year, month, dayOfMonth, 0, 0, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            Intent intent = new Intent(this, DayDetailsActivity.class);
+            intent.putExtra("date", cal.getTimeInMillis());
+            startActivity(intent);
+        });
+    }
 
     @Override
     protected void onResume() {

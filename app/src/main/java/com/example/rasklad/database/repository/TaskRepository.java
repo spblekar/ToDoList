@@ -5,11 +5,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-
 import com.example.rasklad.database.DBHelper;
 import com.example.rasklad.database.TasksContract;
 import com.example.rasklad.models.Task;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -113,7 +111,6 @@ public class TaskRepository {
         }
         return new ArrayList<>(dateSet);
     }
-
 
     public List<Task> getTasksByDate(long dayTimestamp) {
         long startOfDay = dayTimestamp;

@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Rasklad">
         <activity
+            android:name=".activities.CategoryTasksActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.SettingsActivity"
             android:exported="false" />
         <activity
