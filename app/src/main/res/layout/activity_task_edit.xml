@@ -1,102 +1,158 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <LinearLayout
-        android:orientation="vertical"
-        android:padding="16dp"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <ScrollView
+        android:id="@+id/scrollViewContent"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottomBar">
 
-        <TextView
-            android:text="Название задачи"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <EditText
-            android:id="@+id/editTextTitle"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-        <TextView
-            android:text="Описание"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <EditText
-            android:id="@+id/editTextDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            <TextView
+                android:id="@+id/textViewEditTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Новая задача"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="#212121"
+                android:paddingBottom="12dp"/>
 
-        <TextView
-            android:text="Дата выполнения"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <DatePicker
-            android:id="@+id/datePicker"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Название задачи"
+                android:textSize="16sp"
+                android:textColor="#212121"/>
+            <EditText
+                android:id="@+id/editTextTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:hint="Введите название"
+                android:fontFamily="sans-serif"/>
 
-        <TextView
-            android:text="Время выполнения"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <Button
-            android:id="@+id/buttonSelectTime"
-            android:text="Выбрать время"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Категория"
+                android:textSize="16sp"
+                android:textColor="#212121"/>
+            <Spinner
+                android:id="@+id/spinnerCategory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"/>
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Время выполнения"
+                android:textSize="16sp"
+                android:textColor="#212121"/>
+            <Button
+                android:id="@+id/buttonSelectTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Выбрать время"
+                android:layout_marginBottom="12dp"
+                android:backgroundTint="#EEEEEE"
+                android:textColor="#212121"/>
 
-        <TextView
-            android:text="Категория"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <Spinner
-            android:id="@+id/spinnerCategory"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Дата выполнения"
+                android:textSize="16sp"
+                android:textColor="#212121"/>
 
-        <TextView
-            android:text="Приоритет"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <RadioGroup
-            android:id="@+id/radioGroupPriority"
-            android:orientation="horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <RadioButton
-                android:id="@+id/radioLow"
-                android:text="Низкий"
+            <Button
+                android:id="@+id/buttonSelectDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Выбрать дату"
+                android:layout_marginBottom="12dp"
+                android:backgroundTint="#EEEEEE"
+                android:textColor="#212121"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Важность задачи"
+                android:textSize="16sp"
+                android:textColor="#212121"/>
+            <RadioGroup
+                android:id="@+id/radioGroupPriority"
+                android:orientation="horizontal"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <RadioButton
-                android:id="@+id/radioMedium"
-                android:text="Средний"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <RadioButton
-                android:id="@+id/radioHigh"
-                android:text="Высокий"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        </RadioGroup>
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp">
+                <RadioButton
+                    android:id="@+id/radioLow"
+                    android:text="Низкая"
+                    android:textColor="#212121"
+                    android:layout_marginEnd="16dp"/>
+                <RadioButton
+                    android:id="@+id/radioMedium"
+                    android:text="Среднея"
+                    android:textColor="#212121"
+                    android:layout_marginEnd="16dp"/>
+                <RadioButton
+                    android:id="@+id/radioHigh"
+                    android:text="Высокая"
+                    android:textColor="#212121"/>
+            </RadioGroup>
 
-        <CheckBox
-            android:id="@+id/checkBoxCompleted"
-            android:text="Выполнена"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Описание"
+                android:textSize="16sp"
+                android:textColor="#212121"/>
+            <EditText
+                android:id="@+id/editTextDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:hint="Введите описание"
+                android:fontFamily="sans-serif"/>
+        </LinearLayout>
+    </ScrollView>
 
-        <Button
-            android:id="@+id/buttonSaveTask"
-            android:text="Сохранить"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+    <LinearLayout
+        android:id="@+id/bottomBar"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:padding="8dp"
+        android:weightSum="2">
 
         <Button
             android:id="@+id/buttonCancelTask"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
             android:text="Отмена"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:backgroundTint="#DDDDDD"
+            android:textColor="#212121"
+            android:layout_marginEnd="8dp"/>
+
+        <Button
+            android:id="@+id/buttonSaveTask"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="Сохранить"
+            android:backgroundTint="#2196F3"
+            android:textColor="#FFFFFF"/>
     </LinearLayout>
-</ScrollView>
+</RelativeLayout>

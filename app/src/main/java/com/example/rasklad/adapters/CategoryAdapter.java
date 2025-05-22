@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.rasklad.R;
 import com.example.rasklad.activities.CategoryTasksActivity;
 import com.example.rasklad.database.repository.CategoryRepository;
+import com.example.rasklad.database.repository.TaskRepository;
 import com.example.rasklad.models.Category;
 import java.util.List;
 
@@ -19,11 +20,14 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
     private Context context;
     private List<Category> categories;
     private CategoryRepository categoryRepository;
+    private TaskRepository taskRepository;
+
 
     public CategoryAdapter(Context context, List<Category> categories) {
         this.context = context;
         this.categories = categories;
         this.categoryRepository = new CategoryRepository(context);
+        this.taskRepository = new TaskRepository(context);
     }
 
     @Override
@@ -37,42 +41,64 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         Category category = categories.get(position);
         holder.textViewCategoryName.setText(category.getName());
 
-        holder.itemView.setOnClickListener(v -> {
-            final EditText editText = new EditText(context);
-            editText.setText(category.getName());
-            new AlertDialog.Builder(context)
-                    .setTitle("Редактировать категорию")
-                    .setView(editText)
-                    .setPositiveButton("Сохранить", (dialog, which) -> {
-                        category.setName(editText.getText().toString());
-                        categoryRepository.updateCategory(category);
-                        notifyItemChanged(position);
-                    })
-                    .setNegativeButton("Отмена", null)
-                    .show();
-        });
+        int defaultId = categoryRepository.getOrCreateDefaultCategoryId();
 
-        holder.itemView.setOnLongClickListener(v -> {
-            new AlertDialog.Builder(context)
-                    .setTitle("Удаление категории")
-                    .setMessage("Вы уверены, что хотите удалить категорию \"" + category.getName() + "\"?")
-                    .setPositiveButton("Да", (dialog, which) -> {
-                        categoryRepository.deleteCategory(category.getId());
-                        categories.remove(position);
-                        notifyItemRemoved(position);
-                    })
-                    .setNegativeButton("Нет", null)
-                    .show();
-            return true;
-        });
+        if (category.getId() == defaultId) {
+            holder.buttonEdit.setEnabled(false);
+            holder.buttonDelete.setEnabled(false);
+            holder.buttonEdit.setVisibility(View.GONE);
+            holder.buttonDelete.setVisibility(View.GONE);
+        } else {
+            holder.buttonEdit.setEnabled(true);
+            holder.buttonDelete.setEnabled(true);
+            holder.buttonEdit.setAlpha(1f);
+            holder.buttonDelete.setAlpha(1f);
 
-        holder.itemView.setOnClickListener(v -> {
+            holder.buttonDelete.setOnClickListener(v -> {
+                new AlertDialog.Builder(context)
+                        .setTitle("Удаление категории")
+                        .setMessage("Удалить категорию \"" + category.getName() + "\" и перенести задачи в \"Без категории\"?")
+                        .setPositiveButton("Удалить", (dialog, which) -> {
+                            int defaultCategoryId = categoryRepository.getOrCreateDefaultCategoryId();
+                            taskRepository.reassignTasksToCategory(category.getId(), defaultCategoryId);
+                            categoryRepository.deleteCategory(category.getId());
+                            categories.remove(position);
+                            notifyItemRemoved(position);
+                        })
+                        .setNegativeButton("Отмена", null)
+                        .show();
+            });
+
+        }
+
+        holder.textViewCategoryName.setOnClickListener(v -> {
             Intent intent = new Intent(context, CategoryTasksActivity.class);
             intent.putExtra("categoryId", category.getId());
             intent.putExtra("categoryName", category.getName());
             context.startActivity(intent);
         });
 
+        holder.buttonEdit.setOnClickListener(v -> {
+            final EditText editText = new EditText(context);
+            editText.setText(category.getName());
+
+            new AlertDialog.Builder(context)
+                    .setTitle("Редактировать категорию")
+                    .setView(editText)
+                    .setPositiveButton("Сохранить", (dialog, which) -> {
+                        String newName = editText.getText().toString().trim();
+                        if (!newName.isEmpty()) {
+                            category.setName(newName);
+                            categoryRepository.updateCategory(category);
+                            notifyItemChanged(position);
+                        }
+                    })
+                    .setNegativeButton("Отмена", null)
+                    .show();
+        });
+
+        int taskCount = taskRepository.getIncompleteTaskCountByCategory(category.getId());
+        holder.textViewTaskCount.setText("Задач: " + taskCount);
     }
 
     @Override
@@ -80,12 +106,18 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         return categories.size();
     }
 
-    class CategoryViewHolder extends RecyclerView.ViewHolder {
+    static class CategoryViewHolder extends RecyclerView.ViewHolder {
         TextView textViewCategoryName;
+        TextView textViewTaskCount;
+        TextView buttonEdit;
+        TextView buttonDelete;
 
         public CategoryViewHolder(View itemView) {
             super(itemView);
             textViewCategoryName = itemView.findViewById(R.id.textViewCategoryName);
+            textViewTaskCount = itemView.findViewById(R.id.textViewTaskCount);
+            buttonEdit = itemView.findViewById(R.id.buttonEdit);
+            buttonDelete = itemView.findViewById(R.id.buttonDelete);
         }
     }
 }

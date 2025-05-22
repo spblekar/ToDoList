@@ -1,23 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="16dp"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/textViewDayDate"
-        android:textSize="18sp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#212121"
+        android:padding="16dp"
+        android:fontFamily="sans-serif-medium" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvTasks"
+        android:layout_below="@id/textViewDayDate"
+        android:layout_above="@+id/buttonAddTask"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
-    <Button
+        android:layout_height="match_parent"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:overScrollMode="never" />
+
+    <TextView
+        android:id="@+id/emptyDayView"
+        android:layout_below="@id/textViewDayDate"
+        android:layout_above="@+id/buttonAddTask"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="🎉 Здесь пока нет задач"
+        android:textColor="#757575"
+        android:textSize="16sp"
+        android:visibility="gone" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/buttonAddTask"
-        android:text="Добавить задачу"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-</LinearLayout>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="20dp"
+        android:contentDescription="Добавить задачу"
+        android:src="@android:drawable/ic_input_add"
+        android:backgroundTint="#2196F3"
+        android:tint="@android:color/white" />
+</RelativeLayout>

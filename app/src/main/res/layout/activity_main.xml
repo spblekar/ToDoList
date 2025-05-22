@@ -1,40 +1,122 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="16dp"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <CalendarView
-        android:id="@+id/calendarView"
+    <ScrollView
+        android:id="@+id/mainScrollView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"/>
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:layout_above="@+id/buttonAddTask">
 
-    <TextView
-        android:text="Обзор дней"
-        android:textSize="18sp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvPreviewDays"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
-    <Button
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textViewToday"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#212121"
+                android:paddingBottom="12dp"
+                android:fontFamily="sans-serif-medium"/>
+
+            <CalendarView
+                android:id="@+id/calendarView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@android:color/transparent"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="12dp">
+
+                <Button
+                    android:id="@+id/buttonCategories"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:text="Категории"
+                    android:backgroundTint="#DDDDDD"
+                    android:textColor="#212121"/>
+
+                <Button
+                    android:id="@+id/buttonSettings"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="Настройки"
+                    android:backgroundTint="#DDDDDD"
+                    android:textColor="#212121"/>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ближайшие дни"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#212121"
+                android:paddingTop="16dp"
+                android:paddingBottom="4dp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvPreviewDays"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="100dp"
+                android:overScrollMode="never" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Задачи на сегодня"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#212121"
+                android:paddingTop="8dp"
+                android:paddingBottom="4dp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvTodayTasks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:minHeight="150dp"
+                android:overScrollMode="never" />
+
+            <TextView
+                android:id="@+id/emptyTodayView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🎉 Нет задач на сегодня"
+                android:gravity="center"
+                android:textColor="#757575"
+                android:textSize="16sp"
+                android:visibility="gone"
+                android:paddingVertical="12dp"/>
+        </LinearLayout>
+    </ScrollView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/buttonAddTask"
-        android:text="Создать задачу"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"/>
-    <Button
-        android:id="@+id/buttonCategories"
-        android:text="Категории"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-    <Button
-        android:id="@+id/buttonSettings"
-        android:text="Настройки"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-</LinearLayout>
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="20dp"
+        android:contentDescription="Добавить задачу"
+        android:src="@android:drawable/ic_input_add"
+        android:backgroundTint="#2196F3"
+        android:tint="@android:color/white" />
+</RelativeLayout>
