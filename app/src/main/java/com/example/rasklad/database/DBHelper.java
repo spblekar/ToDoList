@@ -6,9 +6,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.content.ContentValues;
 
 public class DBHelper extends SQLiteOpenHelper {
-    private static final String DATABASE_NAME = "rasklad.db";
+    private static final String DATABASE_NAME = "todo.db";
     private static final int DATABASE_VERSION = 1;
-
     private static DBHelper instance;
 
     public static synchronized DBHelper getInstance(Context context) {
@@ -35,14 +34,6 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onOpen(SQLiteDatabase db) {
         super.onOpen(db);
-        ContentValues values = new ContentValues();
-        values.put(TasksContract.CategoryEntry.COLUMN_NAME, "Без категории");
-        db.insertWithOnConflict(
-                TasksContract.CategoryEntry.TABLE_NAME,
-                null,
-                values,
-                SQLiteDatabase.CONFLICT_IGNORE
-        );
     }
 
     @Override
