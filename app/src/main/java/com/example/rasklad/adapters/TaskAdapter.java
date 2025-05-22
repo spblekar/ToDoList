@@ -11,10 +11,13 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.rasklad.R;
 import com.example.rasklad.activities.TaskEditActivity;
+import com.example.rasklad.database.repository.CategoryRepository;
 import com.example.rasklad.database.repository.TaskRepository;
 import com.example.rasklad.models.Task;
 import com.example.rasklad.utils.DateUtils;
 import com.example.rasklad.utils.PriorityUtils;
+
+import java.text.BreakIterator;
 import java.util.List;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
@@ -37,6 +40,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     @Override
     public void onBindViewHolder(TaskViewHolder holder, int position) {
         Task task = tasks.get(position);
+        CategoryRepository categoryRepository = new CategoryRepository(context);
 
         holder.checkBoxCompleted.setOnCheckedChangeListener(null);
         holder.checkBoxCompleted.setChecked(task.isCompleted());
@@ -55,6 +59,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             intent.putExtra("taskId", task.getId());
             context.startActivity(intent);
         });
+
+        holder.textViewTime.setText(DateUtils.formatTime(task.getDueDate()));
+        holder.textViewDate.setText(DateUtils.formatDate(task.getDueDate()));
+
+        String categoryName = categoryRepository.getCategoryNameById(task.getCategoryId());
+        holder.textViewCategory.setText(categoryName);
 
         holder.itemView.setOnLongClickListener(v -> {
             new AlertDialog.Builder(context)
@@ -80,6 +90,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         CheckBox checkBoxCompleted;
         TextView textViewTitle;
         TextView textViewDate;
+        TextView textViewTime;
+        TextView textViewCategory;
         View priorityIndicator;
 
         public TaskViewHolder(View itemView) {
@@ -88,6 +100,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             checkBoxCompleted = itemView.findViewById(R.id.checkBoxTaskCompleted);
             textViewTitle = itemView.findViewById(R.id.textViewTaskTitle);
             textViewDate = itemView.findViewById(R.id.textViewTaskDate);
+            textViewTime = itemView.findViewById(R.id.textViewTaskTime);
+            textViewCategory = itemView.findViewById(R.id.textViewTaskCategory);
         }
     }
 }

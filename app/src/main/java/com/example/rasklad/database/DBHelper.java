@@ -3,38 +3,50 @@ package com.example.rasklad.database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.content.ContentValues;
 
 public class DBHelper extends SQLiteOpenHelper {
-    private static final String DATABASE_NAME = "todo.db";
+    private static final String DATABASE_NAME = "rasklad.db";
     private static final int DATABASE_VERSION = 1;
 
-    public DBHelper(Context context) {
+    private static DBHelper instance;
+
+    public static synchronized DBHelper getInstance(Context context) {
+        if (instance == null) {
+            instance = new DBHelper(context.getApplicationContext());
+        }
+        return instance;
+    }
+
+    private DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String createCategoriesTable = "CREATE TABLE " + TasksContract.CategoryEntry.TABLE_NAME + " (" +
-                TasksContract.CategoryEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                TasksContract.CategoryEntry.COLUMN_NAME + " TEXT NOT NULL)";
-        String createTasksTable = "CREATE TABLE " + TasksContract.TaskEntry.TABLE_NAME + " (" +
-                TasksContract.TaskEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                TasksContract.TaskEntry.COLUMN_TITLE + " TEXT NOT NULL, " +
-                TasksContract.TaskEntry.COLUMN_DESCRIPTION + " TEXT, " +
-                TasksContract.TaskEntry.COLUMN_DUE_DATE + " INTEGER, " +
-                TasksContract.TaskEntry.COLUMN_CATEGORY_ID + " INTEGER, " +
-                TasksContract.TaskEntry.COLUMN_PRIORITY + " INTEGER, " +
-                TasksContract.TaskEntry.COLUMN_COMPLETED + " INTEGER, " +
-                "FOREIGN KEY(" + TasksContract.TaskEntry.COLUMN_CATEGORY_ID + ") REFERENCES " +
-                TasksContract.CategoryEntry.TABLE_NAME + "(" + TasksContract.CategoryEntry._ID + "))";
-        db.execSQL(createCategoriesTable);
-        db.execSQL(createTasksTable);
+        db.execSQL(TasksContract.CategoryEntry.SQL_CREATE_TABLE);
+        db.execSQL(TasksContract.TaskEntry.SQL_CREATE_TABLE);
+
+        ContentValues defaultCat = new ContentValues();
+        defaultCat.put(TasksContract.CategoryEntry.COLUMN_NAME, "Без категории");
+        db.insert(TasksContract.CategoryEntry.TABLE_NAME, null, defaultCat);
+    }
+
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        ContentValues values = new ContentValues();
+        values.put(TasksContract.CategoryEntry.COLUMN_NAME, "Без категории");
+        db.insertWithOnConflict(
+                TasksContract.CategoryEntry.TABLE_NAME,
+                null,
+                values,
+                SQLiteDatabase.CONFLICT_IGNORE
+        );
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TasksContract.CategoryEntry.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + TasksContract.TaskEntry.TABLE_NAME);
-        onCreate(db);
+
     }
 }

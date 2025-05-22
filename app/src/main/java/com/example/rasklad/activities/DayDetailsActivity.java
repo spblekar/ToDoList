@@ -2,47 +2,55 @@ package com.example.rasklad.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
+import android.view.View;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.rasklad.R;
 import com.example.rasklad.adapters.TaskAdapter;
-import com.example.rasklad.constants.AppConstants;
 import com.example.rasklad.database.repository.TaskRepository;
 import com.example.rasklad.models.Task;
 import com.example.rasklad.utils.DateUtils;
-import com.example.rasklad.utils.PreferenceHelper;
-import java.util.Collections;
 import java.util.List;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class DayDetailsActivity extends AppCompatActivity {
     private RecyclerView rvTasks;
-    private TaskAdapter adapter;
+    private TextView textViewDayDate, emptyDayView;
+    private FloatingActionButton buttonAddTask;
     private TaskRepository taskRepository;
-    private TextView textViewDayDate;
-    private Button buttonAddTask;
     private long date;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_day_details);
-        rvTasks = findViewById(R.id.rvTasks);
+
         textViewDayDate = findViewById(R.id.textViewDayDate);
-        buttonAddTask = findViewById(R.id.buttonAddTask);
+        rvTasks         = findViewById(R.id.rvTasks);
+        emptyDayView    = findViewById(R.id.emptyDayView);
+        buttonAddTask   = findViewById(R.id.buttonAddTask);
 
         date = getIntent().getLongExtra("date", System.currentTimeMillis());
-        textViewDayDate.setText(DateUtils.formatDate(date));
+
+        String fullDate = DateUtils.formatFullDate(date);
+
+        fullDate = Character.toUpperCase(fullDate.charAt(0)) + fullDate.substring(1);
+        textViewDayDate.setText(fullDate);
 
         taskRepository = new TaskRepository(this);
         rvTasks.setLayoutManager(new LinearLayoutManager(this));
-        loadTasks();
+        rvTasks.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
         buttonAddTask.setOnClickListener(v -> {
-            startActivity(new Intent(this, TaskEditActivity.class).putExtra("date", date));
+            Intent intent = new Intent(this, TaskEditActivity.class);
+            intent.putExtra("date", date);
+            startActivity(intent);
         });
+
+        loadTasks();
     }
 
     @Override
@@ -53,11 +61,16 @@ public class DayDetailsActivity extends AppCompatActivity {
 
     private void loadTasks() {
         List<Task> tasks = taskRepository.getTasksByDate(date);
-        int sortOrder = PreferenceHelper.getSortOrder(this);
-        if (sortOrder == AppConstants.SORT_BY_PRIORITY) {
-            Collections.sort(tasks, (t1, t2) -> t2.getPriority() - t1.getPriority());
-        }
-        adapter = new TaskAdapter(this, tasks);
+
+        TaskAdapter adapter = new TaskAdapter(this, tasks);
         rvTasks.setAdapter(adapter);
+
+        if (tasks.isEmpty()) {
+            emptyDayView.setVisibility(View.VISIBLE);
+            rvTasks.setVisibility(View.GONE);
+        } else {
+            emptyDayView.setVisibility(View.GONE);
+            rvTasks.setVisibility(View.VISIBLE);
+        }
     }
 }

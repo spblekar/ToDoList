@@ -2,6 +2,7 @@ package com.example.rasklad.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,9 +34,18 @@ public class PreviewDayAdapter extends RecyclerView.Adapter<PreviewDayAdapter.Da
     @Override
     public void onBindViewHolder(DayViewHolder holder, int position) {
         long date = dates.get(position);
-        holder.textViewDayDate.setText(DateUtils.formatDate(date));
+
+        holder.textViewDayDate.setText(DateUtils.getRelativeDayName(date));
+
         int count = taskRepository.getTasksByDate(date).size();
         holder.textViewDayCount.setText("Задач: " + count);
+
+        if (DateUtils.isToday(date)) {
+            holder.itemView.setBackgroundColor(Color.parseColor("#80E0E0E0"));
+        } else {
+            holder.itemView.setBackgroundColor(Color.TRANSPARENT);
+        }
+
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, DayDetailsActivity.class);
             intent.putExtra("date", date);
