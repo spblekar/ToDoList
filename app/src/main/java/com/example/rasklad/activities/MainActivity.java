@@ -14,6 +14,7 @@ import com.example.rasklad.R;
 import com.example.rasklad.adapters.PreviewDayAdapter;
 import com.example.rasklad.adapters.TaskAdapter;
 import com.example.rasklad.database.repository.TaskRepository;
+import com.example.rasklad.models.PreviewDayData;
 import com.example.rasklad.models.Task;
 import com.example.rasklad.utils.DateUtils;
 import java.util.ArrayList;
@@ -125,13 +126,27 @@ public class MainActivity extends AppCompatActivity {
                 .limit(3)
                 .collect(Collectors.toList());
 
-        List<Pair<Long, Integer>> previewDaysWithCounts = new ArrayList<>();
+        List<PreviewDayData> previewDayDetailsList = new ArrayList<>();
         for (Long date : rawDates) {
-            int count = taskRepository.getTasksByDate(date).size();
-            previewDaysWithCounts.add(new Pair<>(date, count));
+            String dayName = DateUtils.getRelativeDayName(date);
+            int totalCount = taskRepository.getTotalTaskCountByDate(date);
+            int incompleteCount = taskRepository.getIncompleteTaskCountByDate(date);
+            int completedCount = totalCount - incompleteCount;
+            int[] priorityCounts = taskRepository.getTaskPriorityCountsByDate(date);
+
+            previewDayDetailsList.add(new PreviewDayData(
+                    date,
+                    dayName,
+                    totalCount,
+                    completedCount,
+                    incompleteCount,
+                    priorityCounts[0],
+                    priorityCounts[1],
+                    priorityCounts[2]
+            ));
         }
 
-        previewDayAdapter = new PreviewDayAdapter(this, previewDaysWithCounts);
+        previewDayAdapter = new PreviewDayAdapter(this, previewDayDetailsList);
         rvPreviewDays.setAdapter(previewDayAdapter);
     }
 

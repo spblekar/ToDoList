@@ -219,4 +219,61 @@ public class TaskRepository {
                 new String[]{String.valueOf(oldCategoryId)}
         );
     }
+
+    @SuppressLint("Range")
+    public int getIncompleteTaskCountByDate(long dayTimestamp) {
+        long startOfDay = dayTimestamp;
+        long endOfDay = startOfDay + (24 * 60 * 60 * 1000) - 1;
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM " + TasksContract.TaskEntry.TABLE_NAME +
+                " WHERE " + TasksContract.TaskEntry.COLUMN_DUE_DATE + " >= ? AND " +
+                TasksContract.TaskEntry.COLUMN_DUE_DATE + " <= ? AND " +
+                TasksContract.TaskEntry.COLUMN_COMPLETED + " = 0";
+        int count = 0;
+        try (Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(startOfDay), String.valueOf(endOfDay)})) {
+            if (cursor != null && cursor.moveToFirst()) {
+                count = cursor.getInt(0);
+            }
+        }
+        return count;
+    }
+
+    @SuppressLint("Range")
+    public int[] getTaskPriorityCountsByDate(long dayTimestamp) {
+        long startOfDay = dayTimestamp;
+        long endOfDay = startOfDay + (24 * 60 * 60 * 1000) - 1;
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        int[] counts = new int[3];
+
+        String queryBase = "SELECT COUNT(*) FROM " + TasksContract.TaskEntry.TABLE_NAME +
+                " WHERE " + TasksContract.TaskEntry.COLUMN_DUE_DATE + " >= ? AND " +
+                TasksContract.TaskEntry.COLUMN_DUE_DATE + " <= ? AND " +
+                TasksContract.TaskEntry.COLUMN_PRIORITY + " = ?";
+
+        for (int priority = 0; priority < 3; priority++) {
+            try (Cursor cursor = db.rawQuery(queryBase, new String[]{String.valueOf(startOfDay), String.valueOf(endOfDay), String.valueOf(priority)})) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    counts[priority] = cursor.getInt(0);
+                }
+            }
+        }
+        return counts;
+    }
+
+    @SuppressLint("Range")
+    public int getTotalTaskCountByDate(long dayTimestamp) {
+        long startOfDay = dayTimestamp;
+        long endOfDay = startOfDay + (24 * 60 * 60 * 1000) - 1; // Определяем конец дня
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM " + TasksContract.TaskEntry.TABLE_NAME +
+                " WHERE " + TasksContract.TaskEntry.COLUMN_DUE_DATE + " >= ? AND " +
+                TasksContract.TaskEntry.COLUMN_DUE_DATE + " <= ?";
+        int count = 0;
+        try (Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(startOfDay), String.valueOf(endOfDay)})) {
+            if (cursor != null && cursor.moveToFirst()) {
+                count = cursor.getInt(0);
+            }
+        }
+        return count;
+    }
 }
