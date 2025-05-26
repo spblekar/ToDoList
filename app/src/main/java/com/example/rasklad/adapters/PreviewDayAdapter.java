@@ -40,12 +40,6 @@ public class PreviewDayAdapter extends RecyclerView.Adapter<PreviewDayAdapter.Da
         int count = taskRepository.getTasksByDate(date).size();
         holder.textViewDayCount.setText("Задач: " + count);
 
-        if (DateUtils.isToday(date)) {
-            holder.itemView.setBackgroundColor(Color.parseColor("#80E0E0E0"));
-        } else {
-            holder.itemView.setBackgroundColor(Color.TRANSPARENT);
-        }
-
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, DayDetailsActivity.class);
             intent.putExtra("date", date);
