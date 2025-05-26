@@ -1,33 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textViewDayDate"
+    <RelativeLayout
+        android:id="@+id/headerLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:textColor="#212121"
-        android:padding="16dp"
-        android:fontFamily="sans-serif-medium" />
+        android:layout_alignParentTop="true"
+        android:paddingTop="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="8dp"> <ImageButton
+        android:id="@+id/buttonBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="?attr/homeAsUpIndicator"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Назад"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:minWidth="48dp"
+        android:minHeight="48dp"/>
+
+        <TextView
+            android:id="@+id/textViewDayDate"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_centerInParent="true" android:textSize="20sp" android:textStyle="bold"
+            android:textColor="#212121"
+            android:fontFamily="sans-serif-medium" />
+    </RelativeLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvTasks"
-        android:layout_below="@id/textViewDayDate"
-        android:layout_above="@+id/buttonAddTask"
+        android:layout_below="@id/headerLayout" android:layout_above="@+id/buttonAddTask"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
         android:overScrollMode="never" />
 
     <TextView
         android:id="@+id/emptyDayView"
-        android:layout_below="@id/textViewDayDate"
-        android:layout_above="@+id/buttonAddTask"
+        android:layout_below="@id/headerLayout" android:layout_above="@+id/buttonAddTask"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
@@ -46,6 +64,5 @@
         android:layout_margin="20dp"
         android:contentDescription="Добавить задачу"
         android:src="@android:drawable/ic_input_add"
-        android:backgroundTint="#2196F3"
-        android:tint="@android:color/white" />
+        app:backgroundTint="#2196F3" app:tint="@android:color/white" />
 </RelativeLayout>

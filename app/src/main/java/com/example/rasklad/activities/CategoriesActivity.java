@@ -6,6 +6,7 @@ import android.text.InputType;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,11 +22,17 @@ public class CategoriesActivity extends AppCompatActivity {
     private CategoryAdapter adapter;
     private CategoryRepository categoryRepository;
     private FloatingActionButton buttonAddCategory;
+    private ImageButton buttonBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_categories);
+
+        buttonBack = findViewById(R.id.buttonBack);
+        buttonBack.setOnClickListener(v -> {
+            getOnBackPressedDispatcher().onBackPressed();
+        });
 
         rvCategories = findViewById(R.id.rvCategories);
         buttonAddCategory = findViewById(R.id.buttonAddCategory);
