@@ -16,6 +16,7 @@ import com.example.rasklad.database.repository.TaskRepository;
 import com.example.rasklad.models.Task;
 import com.example.rasklad.utils.DateUtils;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private PreviewDayAdapter previewDayAdapter;
     private TaskRepository taskRepository;
     private TextView textViewToday;
+    private CalendarView calendarView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,18 +64,28 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.buttonSettings).setOnClickListener(v ->
                 startActivity(new Intent(this, SettingsActivity.class)));
+
+        if (textViewToday != null) {
+            textViewToday.setOnClickListener(v -> {
+                if (this.calendarView != null) {
+                    this.calendarView.setDate(System.currentTimeMillis(), true, true);
+                }
+            });
+        }
     }
 
     private void setupCalendar() {
-        CalendarView calendarView = findViewById(R.id.calendarView);
-        calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
-            Calendar cal = Calendar.getInstance();
-            cal.set(year, month, dayOfMonth, 0, 0, 0);
-            cal.set(Calendar.MILLISECOND, 0);
+        this.calendarView = findViewById(R.id.calendarView);
+        if (this.calendarView != null) {
+            this.calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
+                Calendar cal = Calendar.getInstance();
+                cal.set(year, month, dayOfMonth, 0, 0, 0);
+                cal.set(Calendar.MILLISECOND, 0);
 
-            startActivity(new Intent(this, DayDetailsActivity.class)
-                    .putExtra("date", cal.getTimeInMillis()));
-        });
+                startActivity(new Intent(this, DayDetailsActivity.class)
+                        .putExtra("date", cal.getTimeInMillis()));
+            });
+        }
     }
 
     private void loadData() {
@@ -92,6 +104,11 @@ public class MainActivity extends AppCompatActivity {
         today.set(Calendar.SECOND, 0);
 
         List<Task> todayTasks = taskRepository.getTasksByDate(today.getTimeInMillis());
+
+        if (todayTasks != null && !todayTasks.isEmpty()) {
+            todayTasks.sort(Comparator.comparingLong(Task::getDueDate));
+        }
+
         todayTaskAdapter = new TaskAdapter(this, todayTasks);
         rvTodayTasks.setAdapter(todayTaskAdapter);
 
