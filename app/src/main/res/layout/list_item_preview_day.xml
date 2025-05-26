@@ -18,20 +18,34 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/textViewDayDate"
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:gravity="start"> <TextView
+            android:id="@+id/textViewDayDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="?android:attr/textColorPrimary"
-            android:text="Примерная Дата"/> <TextView
-        android:id="@+id/textViewDayCount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:textSize="14sp"
-        android:textColor="?android:attr/textColorSecondary"
-        android:text="X задач"/> </LinearLayout>
+            android:text="Примерная Дата"/>
+
+            <TextView
+                android:id="@+id/textViewDayPriority" android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="?android:attr/textColorSecondary"
+                android:text="🟩0 🟨0 🟥0"
+                android:layout_marginTop="2dp"/> </LinearLayout>
+
+        <TextView
+            android:id="@+id/textViewDayCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textSize="13sp"  android:textColor="?android:attr/textColorSecondary"
+            android:text="Всего: X\nВып.: Y\nНе вып.: Z"
+            android:gravity="end"/> </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
