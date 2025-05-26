@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
@@ -31,11 +32,17 @@ public class TaskEditActivity extends AppCompatActivity {
     private CategoryRepository categoryRepository;
     private Task task;
     private Calendar dueCalendar = Calendar.getInstance();
+    private ImageButton buttonBackTaskEdit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_edit);
+
+        buttonBackTaskEdit = findViewById(R.id.buttonBackTaskEdit);
+        buttonBackTaskEdit.setOnClickListener(v -> {
+            getOnBackPressedDispatcher().onBackPressed();
+        });
 
         textViewEditTitle   = findViewById(R.id.textViewEditTitle);
         editTextTitle       = findViewById(R.id.editTextTitle);
@@ -45,13 +52,13 @@ public class TaskEditActivity extends AppCompatActivity {
         radioLow            = findViewById(R.id.radioLow);
         radioMedium         = findViewById(R.id.radioMedium);
         radioHigh           = findViewById(R.id.radioHigh);
-        buttonSelectDate  = findViewById(R.id.buttonSelectDate);
+        buttonSelectDate    = findViewById(R.id.buttonSelectDate);
         buttonSelectTime    = findViewById(R.id.buttonSelectTime);
         buttonSaveTask      = findViewById(R.id.buttonSaveTask);
         buttonCancelTask    = findViewById(R.id.buttonCancelTask);
 
-        taskRepository     = new TaskRepository(this);
-        categoryRepository = new CategoryRepository(this);
+        taskRepository      = new TaskRepository(this);
+        categoryRepository  = new CategoryRepository(this);
 
         List<Category> categories = categoryRepository.getAllCategories();
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);

@@ -3,9 +3,9 @@ package com.example.rasklad.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.rasklad.R;
@@ -20,6 +20,7 @@ public class DayDetailsActivity extends AppCompatActivity {
     private RecyclerView rvTasks;
     private TextView textViewDayDate, emptyDayView;
     private FloatingActionButton buttonAddTask;
+    private ImageButton buttonBack;
     private TaskRepository taskRepository;
     private long date;
 
@@ -27,6 +28,11 @@ public class DayDetailsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_day_details);
+
+        buttonBack = findViewById(R.id.buttonBack);
+        buttonBack.setOnClickListener(v -> {
+            getOnBackPressedDispatcher().onBackPressed();
+        });
 
         textViewDayDate = findViewById(R.id.textViewDayDate);
         rvTasks         = findViewById(R.id.rvTasks);
@@ -42,7 +48,6 @@ public class DayDetailsActivity extends AppCompatActivity {
 
         taskRepository = new TaskRepository(this);
         rvTasks.setLayoutManager(new LinearLayoutManager(this));
-        rvTasks.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
         buttonAddTask.setOnClickListener(v -> {
             Intent intent = new Intent(this, TaskEditActivity.class);

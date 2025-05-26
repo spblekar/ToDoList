@@ -1,16 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:padding="16dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".activities.SettingsActivity">
+
+    <RelativeLayout
+        android:id="@+id/settingsHeaderLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="12dp">
+
+        <ImageButton
+            android:id="@+id/buttonSettingsBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="?attr/homeAsUpIndicator" android:background="?attr/selectableItemBackgroundBorderless" android:contentDescription="Назад"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:minWidth="48dp" android:minHeight="48dp"/>
+        <TextView
+            android:id="@+id/textViewSettingsTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Настройки" android:textSize="22sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="#212121"
+            android:layout_centerInParent="true"/>
+    </RelativeLayout>
 
     <TextView
+        android:id="@+id/textViewDevelopmentNotice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Страница в разработке"
         android:textSize="24sp"
-        android:layout_gravity="center"/>
+        android:layout_below="@id/settingsHeaderLayout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"/>
 
-</LinearLayout>
+</RelativeLayout>

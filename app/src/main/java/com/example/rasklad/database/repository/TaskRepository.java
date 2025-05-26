@@ -162,7 +162,6 @@ public class TaskRepository {
         );
     }
 
-
     public int getIncompleteTaskCountByCategory(int categoryId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String query = "SELECT COUNT(*) FROM " + TasksContract.TaskEntry.TABLE_NAME +
