@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.rasklad.R;
 import com.example.rasklad.activities.CategoryTasksActivity;
+import com.example.rasklad.database.DBHelper;
 import com.example.rasklad.database.repository.CategoryRepository;
 import com.example.rasklad.database.repository.TaskRepository;
 import com.example.rasklad.models.Category;
@@ -57,7 +58,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
             holder.buttonDelete.setOnClickListener(v -> {
                 new AlertDialog.Builder(context)
                         .setTitle("Удаление категории")
-                        .setMessage("Удалить категорию \"" + category.getName() + "\" и перенести задачи в \"Без категории\"?")
+                        .setMessage("Удалить категорию \"" + category.getName() + "\" и перенести задачи в \"" + DBHelper.DEFAULT_CATEGORY_NAME + "\"?")
                         .setPositiveButton("Удалить", (dialog, which) -> {
                             int defaultCategoryId = categoryRepository.getOrCreateDefaultCategoryId();
                             taskRepository.reassignTasksToCategory(category.getId(), defaultCategoryId);

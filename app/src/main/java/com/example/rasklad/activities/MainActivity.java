@@ -2,6 +2,7 @@ package com.example.rasklad.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Pair;
 import android.view.View;
 import android.widget.CalendarView;
 import android.widget.TextView;
@@ -15,8 +16,8 @@ import com.example.rasklad.adapters.TaskAdapter;
 import com.example.rasklad.database.repository.TaskRepository;
 import com.example.rasklad.models.Task;
 import com.example.rasklad.utils.DateUtils;
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
         setupRecyclerViews();
         setupButtons();
         setupCalendar();
-
         loadData();
     }
 
@@ -51,20 +51,16 @@ public class MainActivity extends AppCompatActivity {
     private void setupRecyclerViews() {
         rvTodayTasks.setLayoutManager(new LinearLayoutManager(this));
         rvTodayTasks.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-
         rvPreviewDays.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
     }
 
     private void setupButtons() {
         findViewById(R.id.buttonAddTask).setOnClickListener(v ->
                 startActivity(new Intent(this, TaskEditActivity.class)));
-
         findViewById(R.id.buttonCategories).setOnClickListener(v ->
                 startActivity(new Intent(this, CategoriesActivity.class)));
-
         findViewById(R.id.buttonSettings).setOnClickListener(v ->
                 startActivity(new Intent(this, SettingsActivity.class)));
-
         if (textViewToday != null) {
             textViewToday.setOnClickListener(v -> {
                 if (this.calendarView != null) {
@@ -81,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
                 Calendar cal = Calendar.getInstance();
                 cal.set(year, month, dayOfMonth, 0, 0, 0);
                 cal.set(Calendar.MILLISECOND, 0);
-
                 startActivity(new Intent(this, DayDetailsActivity.class)
                         .putExtra("date", cal.getTimeInMillis()));
             });
@@ -91,8 +86,9 @@ public class MainActivity extends AppCompatActivity {
     private void loadData() {
         String fullDate = DateUtils.formatFullDate(System.currentTimeMillis());
         fullDate = Character.toUpperCase(fullDate.charAt(0)) + fullDate.substring(1);
-        textViewToday.setText(fullDate);
-
+        if (textViewToday != null) {
+            textViewToday.setText(fullDate);
+        }
         loadTodayTasks();
         loadPreviewDays();
     }
@@ -102,17 +98,13 @@ public class MainActivity extends AppCompatActivity {
         today.set(Calendar.HOUR_OF_DAY, 0);
         today.set(Calendar.MINUTE, 0);
         today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MILLISECOND, 0);
 
         List<Task> todayTasks = taskRepository.getTasksByDate(today.getTimeInMillis());
 
-        if (todayTasks != null && !todayTasks.isEmpty()) {
-            todayTasks.sort(Comparator.comparingLong(Task::getDueDate));
-        }
-
         todayTaskAdapter = new TaskAdapter(this, todayTasks);
         rvTodayTasks.setAdapter(todayTaskAdapter);
-
-        if (todayTasks.isEmpty()) {
+        if (todayTasks == null || todayTasks.isEmpty()) {
             findViewById(R.id.emptyTodayView).setVisibility(View.VISIBLE);
         } else {
             findViewById(R.id.emptyTodayView).setVisibility(View.GONE);
@@ -127,13 +119,19 @@ public class MainActivity extends AppCompatActivity {
         todayCal.set(Calendar.MILLISECOND, 0);
         long todayStart = todayCal.getTimeInMillis();
 
-        List<Long> dates = taskRepository.getAllTaskDates().stream()
+        List<Long> rawDates = taskRepository.getAllTaskDates().stream()
                 .filter(date -> date >= todayStart)
                 .sorted()
                 .limit(3)
                 .collect(Collectors.toList());
 
-        previewDayAdapter = new PreviewDayAdapter(this, dates);
+        List<Pair<Long, Integer>> previewDaysWithCounts = new ArrayList<>();
+        for (Long date : rawDates) {
+            int count = taskRepository.getTasksByDate(date).size();
+            previewDaysWithCounts.add(new Pair<>(date, count));
+        }
+
+        previewDayAdapter = new PreviewDayAdapter(this, previewDaysWithCounts);
         rvPreviewDays.setAdapter(previewDayAdapter);
     }
 

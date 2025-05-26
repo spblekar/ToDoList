@@ -1,6 +1,7 @@
 package com.example.rasklad.activities;
 
 import android.os.Bundle;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -17,24 +18,37 @@ public class CategoryTasksActivity extends AppCompatActivity {
     private TaskAdapter adapter;
     private TaskRepository taskRepository;
     private TextView textViewCategoryName;
+    private ImageButton buttonBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_day_details);
 
+        buttonBack = findViewById(R.id.buttonBack);
+        buttonBack.setOnClickListener(v -> {
+            getOnBackPressedDispatcher().onBackPressed();
+        });
+
         rvTasks = findViewById(R.id.rvTasks);
         textViewCategoryName = findViewById(R.id.textViewDayDate);
 
         int categoryId = getIntent().getIntExtra("categoryId", -1);
         String categoryName = getIntent().getStringExtra("categoryName");
-        textViewCategoryName.setText("Категория: " + categoryName);
+
+        if (textViewCategoryName != null) {
+            textViewCategoryName.setText("Категория: " + categoryName);
+        }
 
         taskRepository = new TaskRepository(this);
-        List<Task> tasks = new ArrayList<>();
-        for (Task task : taskRepository.getAllTasks()) {
-            if (task.getCategoryId() == categoryId) {
-                tasks.add(task);
+        List<Task> tasks;
+
+        if (categoryId != -1) {
+            tasks = taskRepository.getTasksByCategoryId(categoryId);
+        } else {
+            tasks = new ArrayList<>();
+            if (textViewCategoryName != null) {
+                textViewCategoryName.setText("Категория не найдена");
             }
         }
 

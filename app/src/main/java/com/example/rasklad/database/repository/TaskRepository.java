@@ -16,8 +16,8 @@ import java.util.TreeSet;
 
 public class TaskRepository {
     private DBHelper dbHelper;
-    public TaskRepository(Context context)
-    {
+
+    public TaskRepository(Context context) {
         dbHelper = DBHelper.getInstance(context);
     }
 
@@ -59,95 +59,153 @@ public class TaskRepository {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String where = TasksContract.TaskEntry._ID + " = ?";
         String[] args = { String.valueOf(id) };
-        Cursor cursor = db.query(TasksContract.TaskEntry.TABLE_NAME, null, where, args, null, null, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            Task task = new Task();
-            task.setId(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry._ID)));
-            task.setTitle(cursor.getString(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_TITLE)));
-            task.setDescription(cursor.getString(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_DESCRIPTION)));
-            task.setDueDate(cursor.getLong(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_DUE_DATE)));
-            task.setCategoryId(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_CATEGORY_ID)));
-            task.setPriority(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_PRIORITY)));
-            task.setCompleted(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_COMPLETED)) == 1);
-            cursor.close();
-            return task;
+        Task task = null;
+        try (Cursor cursor = db.query(TasksContract.TaskEntry.TABLE_NAME, null, where, args, null, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                task = new Task();
+                task.setId(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry._ID)));
+                task.setTitle(cursor.getString(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_TITLE)));
+                task.setDescription(cursor.getString(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_DESCRIPTION)));
+                task.setDueDate(cursor.getLong(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_DUE_DATE)));
+                task.setCategoryId(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_CATEGORY_ID)));
+                task.setPriority(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_PRIORITY)));
+                task.setCompleted(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_COMPLETED)) == 1);
+            }
         }
-        return null;
+        return task;
     }
 
     @SuppressLint("Range")
     public List<Task> getAllTasks() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.query(TasksContract.TaskEntry.TABLE_NAME, null, null, null, null, null, null);
         List<Task> tasks = new ArrayList<>();
-        if (cursor.moveToFirst()) {
-            do {
-                Task task = new Task();
-                task.setId(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry._ID)));
-                task.setTitle(cursor.getString(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_TITLE)));
-                task.setDescription(cursor.getString(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_DESCRIPTION)));
-                task.setDueDate(cursor.getLong(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_DUE_DATE)));
-                task.setCategoryId(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_CATEGORY_ID)));
-                task.setPriority(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_PRIORITY)));
-                task.setCompleted(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_COMPLETED)) == 1);
-                tasks.add(task);
-            } while (cursor.moveToNext());
+        try (Cursor cursor = db.query(TasksContract.TaskEntry.TABLE_NAME, null, null, null, null, null, TasksContract.TaskEntry.COLUMN_DUE_DATE + " ASC")) {
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    Task task = new Task();
+                    task.setId(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry._ID)));
+                    task.setTitle(cursor.getString(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_TITLE)));
+                    task.setDescription(cursor.getString(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_DESCRIPTION)));
+                    task.setDueDate(cursor.getLong(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_DUE_DATE)));
+                    task.setCategoryId(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_CATEGORY_ID)));
+                    task.setPriority(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_PRIORITY)));
+                    task.setCompleted(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_COMPLETED)) == 1);
+                    tasks.add(task);
+                } while (cursor.moveToNext());
+            }
         }
-        cursor.close();
         return tasks;
     }
 
-    public List<Long> getAllTaskDates() {
-        List<Task> tasks = getAllTasks();
-        Set<Long> dateSet = new TreeSet<>();
-        Calendar cal = Calendar.getInstance();
-        for (Task t : tasks) {
-            cal.setTimeInMillis(t.getDueDate());
-            cal.set(Calendar.HOUR_OF_DAY, 0);
-            cal.set(Calendar.MINUTE, 0);
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-            dateSet.add(cal.getTimeInMillis());
+    @SuppressLint("Range")
+    public List<Task> getTasksByCategoryId(int categoryId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        List<Task> tasks = new ArrayList<>();
+        String selection = TasksContract.TaskEntry.COLUMN_CATEGORY_ID + " = ?";
+        String[] selectionArgs = { String.valueOf(categoryId) };
+        String orderBy = TasksContract.TaskEntry.COLUMN_DUE_DATE + " ASC";
+
+        try (Cursor cursor = db.query(
+                TasksContract.TaskEntry.TABLE_NAME,
+                null,
+                selection,
+                selectionArgs,
+                null, null, orderBy
+        )) {
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    Task task = new Task();
+                    task.setId(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry._ID)));
+                    task.setTitle(cursor.getString(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_TITLE)));
+                    task.setDescription(cursor.getString(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_DESCRIPTION)));
+                    task.setDueDate(cursor.getLong(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_DUE_DATE)));
+                    task.setCategoryId(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_CATEGORY_ID)));
+                    task.setPriority(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_PRIORITY)));
+                    task.setCompleted(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_COMPLETED)) == 1);
+                    tasks.add(task);
+                } while (cursor.moveToNext());
+            }
         }
-        return new ArrayList<>(dateSet);
+        return tasks;
     }
 
     @SuppressLint("Range")
     public List<Task> getTasksByDate(long dayTimestamp) {
         long startOfDay = dayTimestamp;
-        long endOfDay = startOfDay + 24 * 60 * 60 * 1000;
+        long endOfDay = startOfDay + (24 * 60 * 60 * 1000) - 1;
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
+        List<Task> tasks = new ArrayList<>();
         String selection = TasksContract.TaskEntry.COLUMN_DUE_DATE + " >= ? AND " +
-                TasksContract.TaskEntry.COLUMN_DUE_DATE + " < ?";
+                TasksContract.TaskEntry.COLUMN_DUE_DATE + " <= ?";
         String[] selectionArgs = { String.valueOf(startOfDay), String.valueOf(endOfDay) };
+        String orderBy = TasksContract.TaskEntry.COLUMN_DUE_DATE + " ASC, " + TasksContract.TaskEntry.COLUMN_PRIORITY + " DESC";
 
-        Cursor cursor = db.query(
+        try (Cursor cursor = db.query(
                 TasksContract.TaskEntry.TABLE_NAME,
                 null,
                 selection,
                 selectionArgs,
-                null,
-                null,
-                null
-        );
-
-        List<Task> tasks = new ArrayList<>();
-        if (cursor.moveToFirst()) {
-            do {
-                Task task = new Task();
-                task.setId(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry._ID)));
-                task.setTitle(cursor.getString(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_TITLE)));
-                task.setDescription(cursor.getString(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_DESCRIPTION)));
-                task.setDueDate(cursor.getLong(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_DUE_DATE)));
-                task.setCategoryId(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_CATEGORY_ID)));
-                task.setPriority(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_PRIORITY)));
-                task.setCompleted(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_COMPLETED)) == 1);
-                tasks.add(task);
-            } while (cursor.moveToNext());
+                null, null, orderBy
+        )) {
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    Task task = new Task();
+                    task.setId(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry._ID)));
+                    task.setTitle(cursor.getString(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_TITLE)));
+                    task.setDescription(cursor.getString(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_DESCRIPTION)));
+                    task.setDueDate(cursor.getLong(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_DUE_DATE)));
+                    task.setCategoryId(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_CATEGORY_ID)));
+                    task.setPriority(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_PRIORITY)));
+                    task.setCompleted(cursor.getInt(cursor.getColumnIndex(TasksContract.TaskEntry.COLUMN_COMPLETED)) == 1);
+                    tasks.add(task);
+                } while (cursor.moveToNext());
+            }
         }
-        cursor.close();
         return tasks;
+    }
+
+    @SuppressLint("Range")
+    public List<Long> getAllTaskDates() {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Set<Long> dateSet = new TreeSet<>();
+        String[] columns = { TasksContract.TaskEntry.COLUMN_DUE_DATE };
+
+        try (Cursor cursor = db.query(true,
+                TasksContract.TaskEntry.TABLE_NAME,
+                columns,
+                null, null, null, null,
+                TasksContract.TaskEntry.COLUMN_DUE_DATE + " ASC",
+                null
+        )) {
+            if (cursor != null && cursor.moveToFirst()) {
+                Calendar cal = Calendar.getInstance();
+                do {
+                    long dueDate = cursor.getLong(0);
+                    cal.setTimeInMillis(dueDate);
+                    cal.set(Calendar.HOUR_OF_DAY, 0);
+                    cal.set(Calendar.MINUTE, 0);
+                    cal.set(Calendar.SECOND, 0);
+                    cal.set(Calendar.MILLISECOND, 0);
+                    dateSet.add(cal.getTimeInMillis());
+                } while (cursor.moveToNext());
+            }
+        }
+        return new ArrayList<>(dateSet);
+    }
+
+    public int getIncompleteTaskCountByCategory(int categoryId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM " + TasksContract.TaskEntry.TABLE_NAME +
+                " WHERE " + TasksContract.TaskEntry.COLUMN_CATEGORY_ID + " = ? AND " +
+                TasksContract.TaskEntry.COLUMN_COMPLETED + " = 0";
+        int count = 0;
+        try (Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(categoryId)})) {
+            if (cursor != null && cursor.moveToFirst()) {
+                count = cursor.getInt(0);
+            }
+        }
+        return count;
     }
 
     public void reassignTasksToCategory(int oldCategoryId, int newCategoryId) {
@@ -160,19 +218,5 @@ public class TaskRepository {
                 TasksContract.TaskEntry.COLUMN_CATEGORY_ID + " = ?",
                 new String[]{String.valueOf(oldCategoryId)}
         );
-    }
-
-    public int getIncompleteTaskCountByCategory(int categoryId) {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String query = "SELECT COUNT(*) FROM " + TasksContract.TaskEntry.TABLE_NAME +
-                " WHERE " + TasksContract.TaskEntry.COLUMN_CATEGORY_ID + " = ?" +
-                " AND " + TasksContract.TaskEntry.COLUMN_COMPLETED + " = 0";
-        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(categoryId)});
-        int count = 0;
-        if (cursor.moveToFirst()) {
-            count = cursor.getInt(0);
-        }
-        cursor.close();
-        return count;
     }
 }
