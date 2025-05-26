@@ -20,30 +20,24 @@ public class CategoryRepository {
 
     public long addCategory(Category category) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-
         if (isCategoryNameExists(category.getName())) {
             return -1;
         }
 
         ContentValues values = new ContentValues();
         values.put(TasksContract.CategoryEntry.COLUMN_NAME, category.getName());
-
         return db.insert(TasksContract.CategoryEntry.TABLE_NAME, null, values);
     }
 
     public int updateCategory(Category category) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-
         String query = "SELECT _id FROM " + TasksContract.CategoryEntry.TABLE_NAME +
                 " WHERE LOWER(" + TasksContract.CategoryEntry.COLUMN_NAME + ") = LOWER(?) " +
                 "AND " + TasksContract.CategoryEntry._ID + " != ?";
-        Cursor cursor = db.rawQuery(query, new String[]{category.getName(), String.valueOf(category.getId())});
-
-        boolean nameExists = cursor.moveToFirst();
-        cursor.close();
-
-        if (nameExists) {
-            return -1;
+        try (Cursor cursor = db.rawQuery(query, new String[]{category.getName(), String.valueOf(category.getId())})) {
+            if (cursor != null && cursor.moveToFirst()) {
+                return -1;
+            }
         }
 
         ContentValues values = new ContentValues();
@@ -60,66 +54,67 @@ public class CategoryRepository {
                 new String[]{String.valueOf(categoryId)});
     }
 
+    @SuppressLint("Range")
     public int getOrCreateDefaultCategoryId() {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String where = TasksContract.CategoryEntry.COLUMN_NAME + " = ?";
-        String[] args = { "Без категории" };
-        Cursor cursor = db.query(TasksContract.CategoryEntry.TABLE_NAME, null, where, args, null, null, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            @SuppressLint("Range") int id = cursor.getInt(cursor.getColumnIndex(TasksContract.CategoryEntry._ID));
-            cursor.close();
-            return id;
-        } else {
-            ContentValues values = new ContentValues();
-            values.put(TasksContract.CategoryEntry.COLUMN_NAME, "Без категории");
-            long id = db.insert(TasksContract.CategoryEntry.TABLE_NAME, null, values);
-            return (int) id;
+        String[] args = { DBHelper.DEFAULT_CATEGORY_NAME };
+        int id = -1;
+        try (Cursor cursor = db.query(TasksContract.CategoryEntry.TABLE_NAME,
+                new String[]{TasksContract.CategoryEntry._ID},
+                where, args, null, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                id = cursor.getInt(cursor.getColumnIndex(TasksContract.CategoryEntry._ID));
+            } else {
+                ContentValues values = new ContentValues();
+                values.put(TasksContract.CategoryEntry.COLUMN_NAME, DBHelper.DEFAULT_CATEGORY_NAME);
+                id = (int) db.insert(TasksContract.CategoryEntry.TABLE_NAME, null, values);
+            }
         }
+        return id;
     }
 
     public boolean isCategoryNameExists(String name) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String query = "SELECT COUNT(*) FROM " + TasksContract.CategoryEntry.TABLE_NAME
                 + " WHERE LOWER(" + TasksContract.CategoryEntry.COLUMN_NAME + ") = LOWER(?)";
-
-        try (Cursor cursor = db.rawQuery(query, new String[]{name})) {
-            return cursor.moveToFirst() && cursor.getInt(0) > 0;
+        try (Cursor cursor = db.rawQuery(query, new String[]{name.toLowerCase()})) {
+            return cursor != null && cursor.moveToFirst() && cursor.getInt(0) > 0;
         }
     }
 
     @SuppressLint("Range")
     public String getCategoryNameById(int categoryId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.query(
+        String name = DBHelper.DEFAULT_CATEGORY_NAME;
+        try (Cursor cursor = db.query(
                 TasksContract.CategoryEntry.TABLE_NAME,
                 new String[]{TasksContract.CategoryEntry.COLUMN_NAME},
                 TasksContract.CategoryEntry._ID + " = ?",
                 new String[]{String.valueOf(categoryId)},
                 null, null, null
-        );
-
-        if (cursor != null && cursor.moveToFirst()) {
-            String name = cursor.getString(cursor.getColumnIndex(TasksContract.CategoryEntry.COLUMN_NAME));
-            cursor.close();
-            return name;
+        )) {
+            if (cursor != null && cursor.moveToFirst()) {
+                name = cursor.getString(cursor.getColumnIndex(TasksContract.CategoryEntry.COLUMN_NAME));
+            }
         }
-        return "Без категории";
+        return name;
     }
 
     @SuppressLint("Range")
     public List<Category> getAllCategories() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.query(TasksContract.CategoryEntry.TABLE_NAME, null, null, null, null, null, null);
         List<Category> categories = new ArrayList<>();
-        if (cursor.moveToFirst()) {
-            do {
-                Category category = new Category();
-                category.setId(cursor.getInt(cursor.getColumnIndex(TasksContract.CategoryEntry._ID)));
-                category.setName(cursor.getString(cursor.getColumnIndex(TasksContract.CategoryEntry.COLUMN_NAME)));
-                categories.add(category);
-            } while (cursor.moveToNext());
+        try (Cursor cursor = db.query(TasksContract.CategoryEntry.TABLE_NAME, null, null, null, null, null, TasksContract.CategoryEntry.COLUMN_NAME + " ASC")) {
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    Category category = new Category();
+                    category.setId(cursor.getInt(cursor.getColumnIndex(TasksContract.CategoryEntry._ID)));
+                    category.setName(cursor.getString(cursor.getColumnIndex(TasksContract.CategoryEntry.COLUMN_NAME)));
+                    categories.add(category);
+                } while (cursor.moveToNext());
+            }
         }
-        cursor.close();
         return categories;
     }
 }

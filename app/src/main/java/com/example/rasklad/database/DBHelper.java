@@ -10,6 +10,8 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static DBHelper instance;
 
+    public static final String DEFAULT_CATEGORY_NAME = "Без категории";
+
     public static synchronized DBHelper getInstance(Context context) {
         if (instance == null) {
             instance = new DBHelper(context.getApplicationContext());
@@ -27,17 +29,25 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(TasksContract.TaskEntry.SQL_CREATE_TABLE);
 
         ContentValues defaultCat = new ContentValues();
-        defaultCat.put(TasksContract.CategoryEntry.COLUMN_NAME, "Без категории");
+        defaultCat.put(TasksContract.CategoryEntry.COLUMN_NAME, DEFAULT_CATEGORY_NAME);
         db.insert(TasksContract.CategoryEntry.TABLE_NAME, null, defaultCat);
     }
 
     @Override
     public void onOpen(SQLiteDatabase db) {
         super.onOpen(db);
+        if (!db.isReadOnly()) {
+            db.execSQL("PRAGMA foreign_keys=ON;");
+        }
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+    }
+
+    @Override
+    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
     }
 }
